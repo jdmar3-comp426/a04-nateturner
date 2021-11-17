@@ -25,9 +25,8 @@ app.get("/app/", (req, res, next) => {
 // Define other CRUD API endpoints using express.js and better-sqlite3
 // CREATE a new user (HTTP method POST) at endpoint /app/new/
 app.post("/app/new/", (req, res) => {	
-	const stmt = db.prepare("INSERT into userinfo (user, pass) VALUES (?,?)").all();
-	const info = stmt.run(req.body.user, req.body.pass);
-	res.status(201).json(info.changes);
+	const stmt = db.prepare("INSERT into userinfo (user, pass) VALUES ("+req.body.user+","+req.body.pass+")").all();
+	res.status(201).json(stmt);
 });
 // READ a list of all users (HTTP method GET) at endpoint /app/users/
 app.get("/app/users", (req, res) => {	
@@ -37,21 +36,18 @@ app.get("/app/users", (req, res) => {
 
 // READ a single user (HTTP method GET) at endpoint /app/user/:id
 app.get("/app/user/:id", (req, res) => {	
-	const stmt = db.prepare("SELECT * FROM userinfo WHERE id = ?").all();
-	const info = stmt.run(req.params.id);
-	res.status(200).json(info.changes);
+	const stmt = db.prepare("SELECT * FROM userinfo WHERE id = "+req.params.id).all();
+	res.status(200).json(stmt);
 });
 // UPDATE a single user (HTTP method PATCH) at endpoint /app/update/user/:id
 app.patch("/app/update/user/:id", (req, res) => {	
-	const stmt = db.prepare("UPDATE userinfo SET user = COALESCE(?,user), pass = COALESCE(?,pass) WHERE id = ?").all();
-	const info = stmt.run(req.body.user, req.body.pass, req.params.id);
-	res.status(405).json(info.changes);
+	const stmt = db.prepare("UPDATE userinfo SET user = COALESCE("+req.body.user+",user), pass = COALESCE("+req.body.pass+",pass) WHERE id = "+req.params.id).all();
+	res.status(405).json(stmt);
 });
 // DELETE a single user (HTTP method DELETE) at endpoint /app/delete/user/:id
 app.delete("/app/delete/user/:id", (req, res) => {	
-	const stmt = db.prepare("DELETE FROM userinfo WHERE id = ?").all();
-	const info = stmt.run(req.params.id);
-	res.status(405).json(info.changes);
+	const stmt = db.prepare("DELETE FROM userinfo WHERE id = "+req.params.id).all();
+	res.status(405).json(stmt);
 });
 // Default response for any other request
 app.use(function(req, res){
