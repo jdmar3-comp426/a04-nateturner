@@ -23,8 +23,8 @@ app.get("/app/", (req, res, next) => {
 
 // Define other CRUD API endpoints using express.js and better-sqlite3
 // CREATE a new user (HTTP method POST) at endpoint /app/new/
-app.post("/app/new", (req, res) => {	
-	const stmt = db.prepare("INSERT into userinfo (user, pass) VALUES ("+req.body.user+", "+req.body.pass+")").all();
+app.post("/app/new/", (username, password) => {	
+	const stmt = db.prepare("INSERT into userinfo (user, pass) VALUES ("+username+", "+password+")").all();
 	res.status(201).json(stmt);
 });
 // READ a list of all users (HTTP method GET) at endpoint /app/users/
