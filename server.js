@@ -26,28 +26,32 @@ app.get("/app/", (req, res, next) => {
 
 // CREATE a new user (HTTP method POST) at endpoint /app/new/
 app.post("/app/new/", (req, res) => {	
-	const stmt = db.prepare("INSERT into userinfo (user, pass) VALUES ("+req.params.user+","+req.params.pass+")").all();
-	res.status(201).json(stmt);
+	const stmt = db.prepare("INSERT into userinfo (user, pass) VALUES (?,?)");
+	const u = stmt.run(req.params.user, req.params.pass);
+	res.status(201).json(u);
 });
 // READ a list of all users (HTTP method GET) at endpoint /app/users/
-app.get("/app/users", (res) => {	
+app.get("/app/users", (req, res) => {	
 	const stmt = db.prepare("SELECT * FROM userinfo").all();
 	res.status(200).json(stmt);
 });
 
 // READ a single user (HTTP method GET) at endpoint /app/user/:id
 app.get("/app/user/:id", (req, res) => {	
-	const stmt = db.prepare("SELECT * FROM userinfo WHERE id = "+req.params.id).all();
-	res.status(200).json(stmt);
+	const stmt = db.prepare("SELECT * FROM userinfo WHERE id = ?");
+	const u = stmt.get(req.body.user);
+	res.status(200).json(u);
 });
 // UPDATE a single user (HTTP method PATCH) at endpoint /app/update/user/:id
 app.patch("/app/update/user/:id", (req, res) => {	
-	const stmt = db.prepare("UPDATE userinfo SET user = COALESCE("+req.body.user+",user), pass = COALESCE("+req.body.pass+",pass) WHERE id = "+req.params.id).all();
-	res.status(405).json(req.params.id);
+	const stmt = db.prepare("UPDATE userinfo SET user = COALESCE(?,user), pass = COALESCE(?,pass) WHERE id = ?");
+	const u = stmt.run(req.body.user, req.body.pass, req.params.id);
+	res.status(405).json(u.lastInsertRowid);
 });
 // DELETE a single user (HTTP method DELETE) at endpoint /app/delete/user/:id
 app.delete("/app/delete/user/:id", (req, res) => {	
-	const stmt = db.prepare("DELETE FROM userinfo WHERE id = "+req.params.id).all();
+	const stmt = db.prepare("DELETE FROM userinfo WHERE id = ?");
+	req.params.id
 	res.status(405).json(stmt);
 });
 // Default response for any other request
